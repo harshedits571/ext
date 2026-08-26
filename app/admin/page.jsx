@@ -217,6 +217,7 @@ export default function AdminDashboard() {
                   <option value="explainers">Product Explainer</option>
                   <option value="keynotes">Product Keynote</option>
                   <option value="ads">AD Creative</option>
+                  <option value="vertical">Vertical Video</option>
                 </select>
               </div>
 

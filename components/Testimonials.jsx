@@ -15,9 +15,9 @@ export default function Testimonials() {
             <p className="quote">"{t.quote}"</p>
             <div className="client-info">
               <div className="client-avatar"></div>
-              <div>
-                <strong>{t.name}</strong>
-                <span>{t.role}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <strong style={{ lineHeight: '1.2' }}>{t.name}</strong>
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{t.role}</span>
               </div>
             </div>
           </div>

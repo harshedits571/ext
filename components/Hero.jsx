@@ -27,10 +27,11 @@ export default function Hero({ onOpenModal }) {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
+        style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
         <motion.h1 variants={itemVariants}>We make High-Converting<br /><b>Motion Films for SaaS, AI & Fintech.</b></motion.h1>
-        <motion.p variants={itemVariants}>EXTProduction is a leading motion design studio working with SaaS, AI, and fintech companies. We make product demos, launch videos, promos, ad creatives, explainers, and keynotes that help companies show what they’ve built and get people to care. From the first idea to the final frame, we handle the creative and production so you don’t have to build an in-house video team.</motion.p>
-        <motion.div variants={itemVariants} style={{ display: 'flex', gap: '15px' }}>
+        
+        <motion.div variants={itemVariants} style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link href="/start-project" className="cta-button primary-cta">Book your project</Link>
           </motion.div>

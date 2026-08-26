@@ -11,6 +11,7 @@ import Testimonials from '../components/Testimonials';
 import FAQs from '../components/FAQs';
 import Footer from '../components/Footer';
 import VideoModal from '../components/VideoModal';
+import Founder from '../components/Founder';
 
 export default function Home() {
   const [activeVideoState, setActiveVideoState] = useState({ url: null, time: 0 });
@@ -32,6 +33,7 @@ export default function Home() {
       <Hero onOpenModal={handleOpenModal} />
       <TrustedBy />
       <OurWork onOpenModal={handleOpenModal} />
+      <Founder />
       <OurProcess />
       <Testimonials />
       <FAQs />

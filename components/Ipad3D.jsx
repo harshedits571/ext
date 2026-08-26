@@ -149,7 +149,7 @@ export default function Ipad3D() {
   return (
     <div 
       className="device-mockup glass" 
-      style={{ width: '100%', height: '100%', minHeight: '600px', border: 'none', background: 'transparent', boxShadow: 'none' }}
+      style={{ width: '100%', height: '100%', border: 'none', background: 'transparent', boxShadow: 'none' }}
       onPointerOver={() => setHovered(true)} 
       onPointerOut={() => setHovered(false)}
     >

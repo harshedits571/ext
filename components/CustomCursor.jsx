@@ -18,7 +18,7 @@ export default function CustomCursor() {
   // Premium physics configuration
   const dotSpringConfig = { damping: 25, stiffness: 700, mass: 0.1 };
   const ringSpringConfig = { damping: 25, stiffness: 200, mass: 0.5 };
-  
+
   const dotXSpring = useSpring(dotX, dotSpringConfig);
   const dotYSpring = useSpring(dotY, dotSpringConfig);
   const ringXSpring = useSpring(ringX, ringSpringConfig);
@@ -87,6 +87,7 @@ export default function CustomCursor() {
         animate={{
           scale: isHovering ? 1.5 : 1,
           backgroundColor: isHovering ? "rgba(0, 0, 0, 0.1)" : "transparent",
+          backgroundColor: isHovering ? "rgba(6, 182, 212, 0.1)" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       />
@@ -101,7 +102,7 @@ export default function CustomCursor() {
           left: 0;
           width: 8px;
           height: 8px;
-          background-color: var(--text-primary, #111);
+          background-color: var(--accent-dark);
           border-radius: 50%;
           pointer-events: none;
           z-index: 99999;
@@ -113,7 +114,7 @@ export default function CustomCursor() {
           left: 0;
           width: 32px;
           height: 32px;
-          border: 1.5px solid rgba(0, 0, 0, 0.2);
+          border: 1.5px solid #06b6d4;
           border-radius: 50%;
           pointer-events: none;
           z-index: 99998;
@@ -121,8 +122,8 @@ export default function CustomCursor() {
         
         /* Dark mode compatibility if needed */
         @media (prefers-color-scheme: dark) {
-          .cursor-dot { background-color: #333333ff; }
-          .cursor-ring { border-color: rgba(48, 48, 48, 0.4); }
+          .cursor-dot { background-color: var(--accent-dark); }
+          .cursor-ring { border-color: #06b6d4; }
         }
 
         /* Hide it on mobile/touch devices for better UX */
