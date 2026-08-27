@@ -1,23 +1,51 @@
+"use client";
+
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function Footer() {
   return (
     <footer>
       <div className="footer-cta">
-        <h2>Lets create<br/>incredible videos together.</h2>
-        <Link href="/start-project" className="cta-button secondary-cta" style={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white' }}>Book your project</Link>
+        <motion.h2
+          initial={{ opacity: 0, y: 32, filter: 'blur(8px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Let’s Make Your<br />Product Stand Out.
+        </motion.h2>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.75, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          whileHover={{ scale: 1.04, y: -2 }}
+          whileTap={{ scale: 0.96 }}
+        >
+          <Link href="/start-project" className="cta-button primary-cta footer-cta-btn">Book your project</Link>
+        </motion.div>
       </div>
-      <div className="footer-content">
-        <div className="footer-bottom" style={{ width: '100%' }}>
-          <div className="logo" style={{ color: 'white', fontWeight: 600, fontSize: '1.2rem' }}>EXTProduction</div>
-          <p>&copy; {new Date().getFullYear()} EXTProduction. All rights reserved.</p>
-          <div style={{ display: 'flex', gap: '15px' }}>
-            <a href="#" style={{ color: 'white', textDecoration: 'none' }}>Twitter</a>
-            <a href="#" style={{ color: 'white', textDecoration: 'none' }}>LinkedIn</a>
-            <a href="#" style={{ color: 'white', textDecoration: 'none' }}>Instagram</a>
+
+      <motion.div 
+        className="footer-content"
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.2 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        style={{ width: '100%' }}
+      >
+        <div className="footer-bottom">
+          <div className="footer-logo">EXTProduction</div>
+          <div className="footer-social-links">
+            <a href="#" className="footer-social-link">Twitter</a>
+            <a href="#" className="footer-social-link">YouTube</a>
+            <a href="#" className="footer-social-link">Instagram</a>
           </div>
+          <p className="footer-copyright">&copy; {new Date().getFullYear()} EXTProduction. All rights reserved.</p>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 }

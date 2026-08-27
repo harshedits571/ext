@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import MacNotch from './MacNotch';
 
 export default function OurProcess() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = next, -1 = prev
 
   const steps = [
     {
@@ -19,7 +22,7 @@ export default function OurProcess() {
     {
       num: '03',
       title: 'Storyboarding',
-      desc: 'We storyboard the video frame by frame in Figma, with notes on what happens in each scene and how it will be animated. This gives you a clear idea of the video before we start animating.'
+      desc: 'We storyboard the video frame by frame in Figma/Canva, with notes on what happens in each scene and how it will be animated. This gives you a clear idea of the video before we start animating.'
     },
     {
       num: '04',
@@ -33,58 +36,128 @@ export default function OurProcess() {
     }
   ];
 
-  const handleNext = () => setCurrentIndex((currentIndex + 1) % steps.length);
-  const handlePrev = () => setCurrentIndex((currentIndex - 1 + steps.length) % steps.length);
+  const handleNext = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % steps.length);
+  };
+
+  const handlePrev = () => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + steps.length) % steps.length);
+  };
+
+  const handleDotClick = (idx) => {
+    setDirection(idx > currentIndex ? 1 : -1);
+    setCurrentIndex(idx);
+  };
+
+  const slideVariants = {
+    enter: (dir) => ({
+      x: dir > 0 ? 35 : -35,
+      opacity: 0,
+      filter: 'blur(4px)'
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      transition: {
+        x: { type: "spring", stiffness: 350, damping: 30 },
+        opacity: { duration: 0.25 },
+        filter: { duration: 0.2 }
+      }
+    },
+    exit: (dir) => ({
+      x: dir > 0 ? -35 : 35,
+      opacity: 0,
+      filter: 'blur(4px)',
+      transition: {
+        x: { type: "spring", stiffness: 350, damping: 30 },
+        opacity: { duration: 0.2 },
+        filter: { duration: 0.2 }
+      }
+    })
+  };
 
   return (
-    <section id="process" style={{ padding: '120px 5%', maxWidth: '1400px', margin: '0 auto' }}>
-      <h2 className="section-title">Our Process</h2>
-      
-      <div style={{ position: 'relative', maxWidth: '800px', margin: '60px auto 0', height: '350px' }}>
-        {steps.map((step, idx) => (
-          <div 
-            key={idx} 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              padding: '50px',
-              backgroundColor: 'var(--bg-secondary)',
-              borderRadius: '24px',
-              border: '1px solid var(--border-color)',
-              opacity: idx === currentIndex ? 1 : 0,
-              visibility: idx === currentIndex ? 'visible' : 'hidden',
-              transform: idx === currentIndex ? 'translateX(0)' : 'translateX(30px)',
-              transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              boxShadow: idx === currentIndex ? '0 20px 40px rgba(0,0,0,0.05)' : 'none'
-            }}
-          >
-            <div style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--border-color)', marginBottom: '20px', lineHeight: 1 }}>{step.num}</div>
-            <h3 style={{ fontSize: '2rem', marginBottom: '20px' }}>{step.title}</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>{step.desc}</p>
-          </div>
-        ))}
+    <section id="process" className="process-section">
+      <div className="process-container">
+        <motion.h2 
+          className="section-title"
+          initial={{ opacity: 0, y: 28, filter: 'blur(8px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        >
+          Our Process
+        </motion.h2>
+        
+        <div className="process-card-wrapper">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div 
+              key={currentIndex}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="process-card"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(e, { offset, velocity }) => {
+                const swipe = Math.abs(offset.x) * velocity.x;
+                if (swipe < -100 || offset.x < -60) {
+                  handleNext();
+                } else if (swipe > 100 || offset.x > 60) {
+                  handlePrev();
+                }
+              }}
+            >
+              <MacNotch />
+              <div className="process-num">{steps[currentIndex].num}</div>
+              <h3 className="process-title">{steps[currentIndex].title}</h3>
+              <p className="process-desc">{steps[currentIndex].desc}</p>
+            </motion.div>
+          </AnimatePresence>
 
-        <div style={{ position: 'absolute', bottom: '-80px', left: 0, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '30px' }}>
-          <button onClick={handlePrev} className="cta-button secondary-cta" style={{ width: '50px', height: '50px', padding: 0, borderRadius: '50%', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            {steps.map((_, idx) => (
-              <span 
-                key={idx} 
-                onClick={() => setCurrentIndex(idx)} 
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: idx === currentIndex ? 'var(--accent-dark)' : 'var(--border-color)',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)'
-                }}
-              />
-            ))}
+          {/* Navigation Controls in natural flow below the card */}
+          <div className="process-controls">
+            <motion.button 
+              whileHover={{ scale: 1.08 }} 
+              whileTap={{ scale: 0.92 }}
+              onClick={handlePrev} 
+              className="process-nav-btn"
+              aria-label="Previous step"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </motion.button>
+
+            <div className="process-dots">
+              {steps.map((_, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => handleDotClick(idx)} 
+                  className={`process-dot ${idx === currentIndex ? 'active' : ''}`}
+                  aria-label={`Go to step ${idx + 1}`}
+                />
+              ))}
+            </div>
+
+            <motion.button 
+              whileHover={{ scale: 1.08 }} 
+              whileTap={{ scale: 0.92 }}
+              onClick={handleNext} 
+              className="process-nav-btn"
+              aria-label="Next step"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </motion.button>
           </div>
-          <button onClick={handleNext} className="cta-button secondary-cta" style={{ width: '50px', height: '50px', padding: 0, borderRadius: '50%', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>→</button>
         </div>
       </div>
     </section>

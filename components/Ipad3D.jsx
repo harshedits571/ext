@@ -4,52 +4,86 @@ import { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Environment, PresentationControls, ContactShadows, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { getOptimizedVideoUrl } from '../lib/videoOptimizer';
 
-function IpadModel({ hovered, ...props }) {
+const DEFAULT_HERO_VIDEO = 'https://res.cloudinary.com/dpxpczyhh/video/upload/v1781972444/landscape__jupv1z.mp4';
+
+function IpadModel({ hovered, videoUrl = DEFAULT_HERO_VIDEO, ...props }) {
   const { nodes, materials } = useGLTF('/ipad.glb');
   const groupRef = useRef();
-  
-  const [video] = useState(() => {
+  const [video, setVideo] = useState(null);
+  const canvasRef = useRef(null);
+  const textureRef = useRef(null);
+
+  // Setup high-definition offscreen canvas with natural iPad screen aspect ratio (~1.406:1)
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1440;
+    canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasRef.current = { canvas, ctx };
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.flipY = false;
+    texture.center.set(0.5, 0.5);
+    texture.rotation = -Math.PI / 2;
+    texture.generateMipmaps = false;
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    textureRef.current = texture;
+
+    return () => {
+      texture.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
+    const srcUrl = videoUrl || DEFAULT_HERO_VIDEO;
+    const optimized = getOptimizedVideoUrl(srcUrl);
     const vid = document.createElement('video');
-    vid.src = 'https://res.cloudinary.com/dpxpczyhh/video/upload/v1781972444/landscape__jupv1z.mp4';
+    vid.src = optimized;
     vid.crossOrigin = 'Anonymous';
     vid.loop = true;
     vid.muted = true;
     vid.playsInline = true;
-    vid.play();
-    return vid;
-  });
+    vid.play().catch(() => {});
+    setVideo(vid);
+
+    return () => {
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    };
+  }, [videoUrl]);
 
   useEffect(() => {
-    if (materials && video) {
-      const texture = new THREE.VideoTexture(video);
-      texture.flipY = false;
-      // Rotate texture by 90 degrees clockwise (-Math.PI / 2) around its center
-      texture.center.set(0.5, 0.5);
-      texture.rotation = -Math.PI / 2;
+    if (materials && textureRef.current) {
+      const texture = textureRef.current;
       
-      // Auto-detect the screen material by finding which material has an emissiveMap or map
-      // This is a robust way to find the screen without knowing the exact hash name
+      // Auto-detect the screen material and bind canvas texture
       Object.values(materials).forEach((mat) => {
         if (mat.map || mat.emissiveMap || mat.name.toLowerCase().includes('screen')) {
-          mat.map = null; // Remove standard map to prevent double-lighting
+          mat.map = null;
           mat.emissiveMap = texture;
           mat.emissive = new THREE.Color('white');
           mat.emissiveIntensity = 1.0;
-          mat.color = new THREE.Color('black'); // Set base color to black so it doesn't reflect ambient light (which washes it out)
-          mat.toneMapped = false; // Prevent ThreeJS from applying automatic exposure adjustments
+          mat.color = new THREE.Color('black');
+          mat.toneMapped = false;
           mat.needsUpdate = true;
         }
         
-        // Also make any glass layers highly transparent to prevent glare
         if (mat.name.toLowerCase().includes('glass') || mat.transparent) {
             mat.transparent = true;
-            mat.opacity = 0.05; // Make it extremely sheer so it doesn't wash out the screen
+            mat.opacity = 0.05;
             mat.needsUpdate = true;
         }
       });
     }
-  }, [materials, video]);
+  }, [materials]);
 
   useFrame((state, delta) => {
     const targetRotationX = hovered ? -0.1 : 0;
@@ -58,6 +92,35 @@ function IpadModel({ hovered, ...props }) {
     if (groupRef.current) {
       groupRef.current.rotation.x = THREE.MathUtils.damp(groupRef.current.rotation.x, targetRotationX, 5, delta);
       groupRef.current.rotation.y = THREE.MathUtils.damp(groupRef.current.rotation.y, targetRotationY, 5, delta);
+    }
+
+    // Render letterboxed video frame preserving original aspect ratio (16:9, etc.)
+    if (video && video.readyState >= 2 && canvasRef.current && textureRef.current) {
+      const { canvas, ctx } = canvasRef.current;
+      const screenAspect = canvas.width / canvas.height;
+      const videoWidth = video.videoWidth || 1920;
+      const videoHeight = video.videoHeight || 1080;
+      const videoAspect = videoWidth / videoHeight;
+
+      let drawW, drawH, drawX, drawY;
+      if (videoAspect > screenAspect) {
+        // Video is wider than screen (e.g. 16:9 on ~4:3 screen) -> black bars on top and bottom
+        drawW = canvas.width;
+        drawH = canvas.width / videoAspect;
+        drawX = 0;
+        drawY = (canvas.height - drawH) / 2;
+      } else {
+        // Video is taller -> black bars on left and right
+        drawH = canvas.height;
+        drawW = canvas.height * videoAspect;
+        drawX = (canvas.width - drawW) / 2;
+        drawY = 0;
+      }
+
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(video, drawX, drawY, drawW, drawH);
+      textureRef.current.needsUpdate = true;
     }
   });
 
@@ -145,6 +208,19 @@ function Loader() {
 
 export default function Ipad3D() {
   const [hovered, setHovered] = useState(false);
+  const [heroVideoUrl, setHeroVideoUrl] = useState(DEFAULT_HERO_VIDEO);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'settings', 'hero'), (docSnap) => {
+      if (docSnap.exists() && docSnap.data().videoUrl) {
+        setHeroVideoUrl(docSnap.data().videoUrl);
+      }
+    }, (error) => {
+      console.warn("Could not load hero video from settings:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div 
@@ -167,7 +243,7 @@ export default function Ipad3D() {
             config={{ mass: 2, tension: 400 }} 
             snap={{ mass: 4, tension: 400 }}
           >
-            <IpadModel hovered={hovered} scale={2.5} position={[0, -0.0, 0]} rotation={[Math.PI / 1, 3, 0]} />
+            <IpadModel hovered={hovered} videoUrl={heroVideoUrl} scale={2.5} position={[0, -0.0, 0]} rotation={[Math.PI / 1, 3, 0]} />
           </PresentationControls>
           
           <ContactShadows position={[0, -1.0, 0]} opacity={0.4} scale={10} blur={3} far={4.5} />

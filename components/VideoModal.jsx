@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
+import { getOptimizedVideoUrl } from '../lib/videoOptimizer';
 
 export default function VideoModal({ videoUrl, startTime = 0, onClose }) {
   const modalRef = useRef();
@@ -88,7 +89,7 @@ export default function VideoModal({ videoUrl, startTime = 0, onClose }) {
           ) : (
             <video 
               ref={videoRef}
-              src={finalUrl} 
+              src={getOptimizedVideoUrl(finalUrl)} 
               autoPlay 
               controls 
               style={{ width: '100%', height: '100%', objectFit: 'contain' }}

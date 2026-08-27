@@ -86,8 +86,7 @@ export default function CustomCursor() {
         style={{ x: ringXSpring, y: ringYSpring, opacity: isHidden ? 0 : 1 }}
         animate={{
           scale: isHovering ? 1.5 : 1,
-          backgroundColor: isHovering ? "rgba(0, 0, 0, 0.1)" : "transparent",
-          backgroundColor: isHovering ? "rgba(6, 182, 212, 0.1)" : "transparent",
+          backgroundColor: isHovering ? "rgba(0, 0, 0, 0.06)" : "transparent",
         }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       />
@@ -114,7 +113,7 @@ export default function CustomCursor() {
           left: 0;
           width: 32px;
           height: 32px;
-          border: 1.5px solid #06b6d4;
+          border: 1.5px solid #000000;
           border-radius: 50%;
           pointer-events: none;
           z-index: 99998;
@@ -123,7 +122,7 @@ export default function CustomCursor() {
         /* Dark mode compatibility if needed */
         @media (prefers-color-scheme: dark) {
           .cursor-dot { background-color: var(--accent-dark); }
-          .cursor-ring { border-color: #06b6d4; }
+          .cursor-ring { border-color: #000000; }
         }
 
         /* Hide it on mobile/touch devices for better UX */
