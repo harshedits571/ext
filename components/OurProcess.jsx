@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MacNotch from './MacNotch';
 
 export default function OurProcess() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1); // 1 = next, -1 = prev
+
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isHorizontalSwipe = useRef(false);
 
   const steps = [
     {
@@ -47,36 +51,60 @@ export default function OurProcess() {
   };
 
   const handleDotClick = (idx) => {
+    if (idx === currentIndex) return;
     setDirection(idx > currentIndex ? 1 : -1);
     setCurrentIndex(idx);
   };
 
+  // Pure GPU-accelerated variants (transform and opacity only - no heavy blur filters that lag mobile GPUs)
   const slideVariants = {
     enter: (dir) => ({
-      x: dir > 0 ? 35 : -35,
+      x: dir > 0 ? 28 : -28,
       opacity: 0,
-      filter: 'blur(4px)'
     }),
     center: {
       x: 0,
       opacity: 1,
-      filter: 'blur(0px)',
       transition: {
-        x: { type: "spring", stiffness: 350, damping: 30 },
-        opacity: { duration: 0.25 },
-        filter: { duration: 0.2 }
+        x: { type: "spring", stiffness: 420, damping: 34 },
+        opacity: { duration: 0.2, ease: "easeOut" }
       }
     },
     exit: (dir) => ({
-      x: dir > 0 ? -35 : 35,
+      x: dir > 0 ? -28 : 28,
       opacity: 0,
-      filter: 'blur(4px)',
       transition: {
-        x: { type: "spring", stiffness: 350, damping: 30 },
-        opacity: { duration: 0.2 },
-        filter: { duration: 0.2 }
+        x: { type: "spring", stiffness: 420, damping: 34 },
+        opacity: { duration: 0.16, ease: "easeIn" }
       }
     })
+  };
+
+  // Native, lightweight touch handlers that NEVER block vertical page scrolling
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isHorizontalSwipe.current = false;
+  };
+
+  const handleTouchMove = (e) => {
+    const diffX = e.touches[0].clientX - touchStartX.current;
+    const diffY = e.touches[0].clientY - touchStartY.current;
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+      isHorizontalSwipe.current = true;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (isHorizontalSwipe.current) {
+      const diffX = e.changedTouches[0].clientX - touchStartX.current;
+      if (diffX < -40) {
+        handleNext();
+      } else if (diffX > 40) {
+        handlePrev();
+      }
+    }
+    isHorizontalSwipe.current = false;
   };
 
   return (
@@ -92,48 +120,43 @@ export default function OurProcess() {
           Our Process
         </motion.h2>
         
-        <div className="process-card-wrapper">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div 
-              key={currentIndex}
-              custom={direction}
-              variants={slideVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              className="process-card"
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(e, { offset, velocity }) => {
-                const swipe = Math.abs(offset.x) * velocity.x;
-                if (swipe < -100 || offset.x < -60) {
-                  handleNext();
-                } else if (swipe > 100 || offset.x > 60) {
-                  handlePrev();
-                }
-              }}
-            >
-              <MacNotch />
-              <div className="process-num">{steps[currentIndex].num}</div>
-              <h3 className="process-title">{steps[currentIndex].title}</h3>
-              <p className="process-desc">{steps[currentIndex].desc}</p>
-            </motion.div>
-          </AnimatePresence>
+        <div 
+          className="process-card-wrapper"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="process-card-stage">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div 
+                key={currentIndex}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="process-card"
+              >
+                <MacNotch />
+                <div className="process-num">{steps[currentIndex].num}</div>
+                <h3 className="process-title">{steps[currentIndex].title}</h3>
+                <p className="process-desc">{steps[currentIndex].desc}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-          {/* Navigation Controls in natural flow below the card */}
+          {/* Navigation Controls in a permanently stable position */}
           <div className="process-controls">
-            <motion.button 
-              whileHover={{ scale: 1.08 }} 
-              whileTap={{ scale: 0.92 }}
+            <button 
               onClick={handlePrev} 
               className="process-nav-btn"
               aria-label="Previous step"
+              type="button"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
-            </motion.button>
+            </button>
 
             <div className="process-dots">
               {steps.map((_, idx) => (
@@ -142,21 +165,21 @@ export default function OurProcess() {
                   onClick={() => handleDotClick(idx)} 
                   className={`process-dot ${idx === currentIndex ? 'active' : ''}`}
                   aria-label={`Go to step ${idx + 1}`}
+                  type="button"
                 />
               ))}
             </div>
 
-            <motion.button 
-              whileHover={{ scale: 1.08 }} 
-              whileTap={{ scale: 0.92 }}
+            <button 
               onClick={handleNext} 
               className="process-nav-btn"
               aria-label="Next step"
+              type="button"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
-            </motion.button>
+            </button>
           </div>
         </div>
       </div>

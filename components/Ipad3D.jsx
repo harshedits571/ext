@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, PresentationControls, ContactShadows, useGLTF, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -206,6 +206,53 @@ function Loader() {
   );
 }
 
+function ResponsiveIpadScene({ hovered, heroVideoUrl }) {
+  const { viewport } = useThree();
+
+  // Dynamic Scale & Positioning calculation:
+  // Base scale is 2.5 on high-res desktop monitors.
+  // The iPad model geometry in 3D units has width ~0.28 and height ~0.20 (at scale 1).
+  // We ensure the iPad model never exceeds 82% of viewport width and 68% of viewport height (leaving space for laurel badge below).
+  const maxScaleFromWidth = (viewport.width * 0.82) / 0.28;
+  const maxScaleFromHeight = (viewport.height * 0.68) / 0.20;
+  const dynamicScale = Math.min(2.5, maxScaleFromWidth, maxScaleFromHeight);
+
+  // Position the iPad slightly above the center (positive Y in Three.js is UP)
+  // so the bottom area remains clean for the laurel wreath award badge
+  const yOffset = viewport.height * 0.035;
+  const shadowY = -0.32 * (dynamicScale / 2.5) + yOffset;
+
+  return (
+    <>
+      <PresentationControls 
+        global 
+        rotation={[0, 0, 0]} 
+        polar={[-0.35, 0.2]} 
+        azimuth={[-0.85, 0.75]} 
+        config={{ mass: 2, tension: 400 }} 
+        snap={{ mass: 4, tension: 400 }}
+      >
+        <IpadModel 
+          hovered={hovered} 
+          videoUrl={heroVideoUrl} 
+          scale={dynamicScale} 
+          position={[0, yOffset, 0]} 
+          rotation={[Math.PI / 1, 3, 0]} 
+        />
+      </PresentationControls>
+      
+      <ContactShadows 
+        position={[0, shadowY, 0]} 
+        opacity={0.4} 
+        scale={6 * (dynamicScale / 2.5)} 
+        blur={2.8} 
+        far={3.5} 
+      />
+      <Environment preset="city" />
+    </>
+  );
+}
+
 export default function Ipad3D() {
   const [hovered, setHovered] = useState(false);
   const [heroVideoUrl, setHeroVideoUrl] = useState(DEFAULT_HERO_VIDEO);
@@ -229,25 +276,17 @@ export default function Ipad3D() {
       onPointerOver={() => setHovered(true)} 
       onPointerOut={() => setHovered(false)}
     >
-      <Canvas camera={{ position: [0, 0, 1.2], fov: 45 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 1.2], fov: 45 }}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true }}
+      >
         <ambientLight intensity={1.5} />
         <directionalLight position={[10, 10, 5]} intensity={2} />
         <pointLight position={[-10, -10, -10]} intensity={1} />
         
         <Suspense fallback={<Loader />}>
-          <PresentationControls 
-            global 
-            rotation={[0, 0, 0]} 
-            polar={[-0.4, 0.2]} 
-            azimuth={[-1, 0.75]} 
-            config={{ mass: 2, tension: 400 }} 
-            snap={{ mass: 4, tension: 400 }}
-          >
-            <IpadModel hovered={hovered} videoUrl={heroVideoUrl} scale={2.5} position={[0, -0.0, 0]} rotation={[Math.PI / 1, 3, 0]} />
-          </PresentationControls>
-          
-          <ContactShadows position={[0, -1.0, 0]} opacity={0.4} scale={10} blur={3} far={4.5} />
-          <Environment preset="city" />
+          <ResponsiveIpadScene hovered={hovered} heroVideoUrl={heroVideoUrl} />
         </Suspense>
       </Canvas>
     </div>

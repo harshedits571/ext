@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 export default function Founder() {
   return (
-    <section id="about" style={{ padding: '120px 5%', textAlign: 'center' }}>
+    <section id="about" className="founder-section">
       <div style={{ maxWidth: '850px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
         {/* Animated Badge */}

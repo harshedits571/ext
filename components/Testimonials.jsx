@@ -17,7 +17,7 @@ export default function Testimonials() {
       quote: 'Video’s unreal bro. Appreciate it. I’ll let you know about future projects.',
       name: 'Brody Hunt',
       role: 'Autowrap',
-      image: '/AM.JPEG'
+      image: '/AM.jpeg'
     },
     {
       id: 3,
@@ -35,7 +35,7 @@ export default function Testimonials() {
     },
     {
       id: 5,
-      quote: 'The animated SaaS product ad was delivered with exceptional clarity, creativity, and attention to detail. Communication was smooth, the timelines were respected, and the final video exceeded expectations. I\'ll recommend you to my fellows for high-quality animation and product storytelling.Thank you so much.',
+      quote: 'The animated SaaS product ad was delivered with exceptional clarity, creativity, and attention to detail. Communication was smooth, the timelines were respected, and the final video exceeded expectations. I\'ll recommend you to my fellows for high-quality animation and product storytelling. Thank you so much.',
       name: 'Talha',
       role: 'Maxterz',
       image: '/maxterz.jpeg'
