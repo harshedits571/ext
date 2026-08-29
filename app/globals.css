@@ -585,11 +585,12 @@ section {
 }
 
 .award-badge-img {
-    width: 380px;
+    width: 500px;
     max-width: 90%;
     height: auto;
     object-fit: contain;
     display: block;
+    margin: 0 auto;
     filter: drop-shadow(0 4px 14px rgba(15, 23, 42, 0.05));
     transition: transform 0.3s ease;
 }
@@ -599,8 +600,9 @@ section {
     .hero-visual {
         height: 600px;
     }
+
     .award-badge-img {
-        width: 330px;
+        width: 420px;
     }
 }
 
@@ -608,17 +610,28 @@ section {
     .ipad-award-badge {
         bottom: 18px;
     }
+
     .award-badge-img {
-        width: 300px;
+        width: 380px;
     }
 }
 
 @media (max-width: 768px) {
     .ipad-award-badge {
-        bottom: 14px;
+        bottom: -10px;
     }
+
     .award-badge-img {
-        width: 255px;
+        width: 330px;
+    }
+
+    .hero-actions {
+        gap: 10px;
+    }
+
+    .hero-btn {
+        padding: 11px 18px !important;
+        font-size: 0.85rem !important;
     }
 }
 
@@ -635,7 +648,7 @@ section {
     .hero-section {
         flex-direction: column;
         justify-content: center;
-        text-align: center;
+        text-align: left;
         padding-top: 140px;
         gap: 40px;
     }
@@ -644,30 +657,36 @@ section {
         max-width: 100%;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
     }
 
     .hero-title {
-        text-align: center;
-        align-items: center;
+        text-align: left;
+        align-items: flex-start;
+        font-size: clamp(1.6rem, 9vw, 3rem);
     }
 
     .hero-title-line {
-        justify-content: center;
-        white-space: normal;
+        justify-content: flex-start;
+        white-space: nowrap;
+        flex-wrap: nowrap;
+    }
+
+    .for-text {
+        white-space: nowrap;
     }
 
     .hero-description {
-        text-align: center;
+        text-align: left;
     }
 
     .hero-actions {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .hero-social-proof {
-        justify-content: center;
+        justify-content: flex-start;
     }
 
     .proof-text {
@@ -866,11 +885,11 @@ section {
     .navbar,
     .navbar.scrolled {
         width: calc(100% - 32px) !important;
-        max-width: 380px !important;
-        padding: 9px 18px !important;
+        max-width: 250px !important;
+        padding: 6px 14px !important;
         border-radius: 9999px !important;
         background: #ffffff !important;
-        top: 15px !important;
+        top: 12px !important;
         left: 0 !important;
         right: 0 !important;
         margin: 0 auto !important;
@@ -878,15 +897,15 @@ section {
     }
 
     .navbar .logo {
-        gap: 8px;
+        gap: 6px;
     }
 
     .navbar .logo img {
-        height: 22px !important;
+        height: 18px !important;
     }
 
     .navbar .brand-name {
-        font-size: 1.02rem !important;
+        font-size: 0.95rem !important;
     }
 
     .hamburger-btn {
@@ -1100,7 +1119,7 @@ section {
 .work-filters-wrapper {
     width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
@@ -1115,6 +1134,7 @@ section {
 
 .work-filters {
     display: inline-flex;
+    margin: 0 auto;
     align-items: center;
     gap: 6px;
     flex-wrap: nowrap;
@@ -1157,8 +1177,13 @@ section {
 /* Swiper Slider Overrides */
 .work-swiper-container {
     width: 100%;
-    padding-top: 50px;
-    padding-bottom: 50px;
+}
+
+.mySwiper {
+    padding-top: 60px !important;
+    padding-bottom: 60px !important;
+    overflow: visible !important;
+    clip-path: inset(-60px 0 -60px 0);
 }
 
 /* Swiper Navigation Arrows */
@@ -1265,7 +1290,6 @@ section {
     height: 675px;
     border-radius: 24px;
     background: #000000;
-    overflow: hidden;
     cursor: pointer;
     transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
         opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
@@ -1520,7 +1544,6 @@ section {
     width: 100%;
     aspect-ratio: 16/9;
     border-radius: 16px;
-    overflow: hidden;
     cursor: pointer;
     position: relative;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
@@ -1535,7 +1558,6 @@ section {
     height: 100%;
     background-color: #000;
     border-radius: 16px;
-    overflow: hidden;
     transform: translateZ(0);
     backface-visibility: hidden;
 }
@@ -1850,7 +1872,8 @@ section {
     display: grid;
     grid-template-columns: 1fr 380px;
     gap: 70px;
-    align-items: center; /* Centered vertically in PC view */
+    align-items: center;
+    /* Centered vertically in PC view */
 }
 
 .faq-accordion {
@@ -2361,7 +2384,7 @@ footer {
     z-index: 100;
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 
+    box-shadow:
         0 20px 45px -10px rgba(0, 0, 0, 0.18),
         0 0 0 1px rgba(0, 0, 0, 0.08);
     padding: 20px;

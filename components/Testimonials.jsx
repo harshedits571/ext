@@ -17,7 +17,7 @@ export default function Testimonials() {
       quote: 'Video’s unreal bro. Appreciate it. I’ll let you know about future projects.',
       name: 'Brody Hunt',
       role: 'Autowrap',
-      image: '/AM.jpeg'
+      image: '/AM.JPEG'
     },
     {
       id: 3,

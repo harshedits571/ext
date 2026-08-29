@@ -246,7 +246,7 @@ export default function AdminDashboard() {
         </div>
       </div>
       
-      <div className="admin-tabs" style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+      <div className="admin-tabs" style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
         <button 
           className={`cta-button ${activeTab === 'leads' ? 'primary-cta' : 'secondary-cta'}`}
           onClick={() => setActiveTab('leads')}
@@ -502,7 +502,7 @@ export default function AdminDashboard() {
           </div>
           
           {/* 3D iPad Hero Video Management Section */}
-          <div className="ipad-management-card glass" style={{ width: '100%', marginTop: '20px', padding: '32px', borderRadius: '24px', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
+          <div className="ipad-management-card glass" style={{ width: '100%', marginTop: '20px', padding: 'clamp(16px, 4vw, 32px)', borderRadius: '24px', border: '1px solid rgba(37, 99, 235, 0.25)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '20px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -523,7 +523,7 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '25px', alignItems: 'center' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '25px', alignItems: 'center' }}>
               <form onSubmit={handleSaveHeroVideo} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', fontSize: '0.92rem', color: '#0f172a' }}>

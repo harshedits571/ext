@@ -214,10 +214,9 @@ export default function Navbar() {
                 animate={{
                   opacity: isMobileMenuOpen ? 0 : 1,
                   scaleX: isMobileMenuOpen ? 0 : 1,
-                  x: isMobileMenuOpen ? -6 : 0,
                 }}
                 transition={{ duration: 0.15 }}
-                style={{ width: '70%', height: '2px', backgroundColor: '#0f172a', borderRadius: '2px', display: 'block' }}
+                style={{ width: '100%', height: '2px', backgroundColor: '#0f172a', borderRadius: '2px', display: 'block' }}
               />
               <motion.span
                 animate={{

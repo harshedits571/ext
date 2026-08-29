@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Ipad3D from './Ipad3D';
-import AwardBadge from './AwardBadge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
@@ -143,10 +142,11 @@ export default function Hero({ onOpenModal }) {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            style={{ display: 'flex', justifyContent: 'center', width: '100%' }}
           >
             <img 
-              src="/award-badge.png" 
-              alt="#1 IMAGES FOR BUSINESS" 
+              src="/project.png" 
+              alt="# featured Project this month" 
               className="award-badge-img"
             />
           </motion.div>
